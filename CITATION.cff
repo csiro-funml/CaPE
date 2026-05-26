@@ -7,7 +7,7 @@ authors:
     given-names: Edwin V.
     affiliation: CSIRO
 repository-code: https://github.com/csiro-funml/CaPE
-license: 
+license: Apache License 2.0
 date-released: 2026
 preferred-citation:
   type: article
