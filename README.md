@@ -2,8 +2,8 @@
 
 Code release for **Causal Preference Elicitation (CaPE)** (Bonilla, Zhao, Steinberg, 2026).
 
-- Paper: https://arxiv.org/abs/2602.01483
-- Repo: https://github.com/ebonilla/CausalPreferenceElicitation
+- Pre-print: https://arxiv.org/abs/2602.01483
+- Repo: https://github.com/csiro-funml/CaPE 
 
 ![Reproducible](https://img.shields.io/badge/reproducibility-one_command-brightgreen)
 
