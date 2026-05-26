@@ -3,6 +3,8 @@
 Official code release for **Causal Preference Elicitation (CaPE)**  
 Edwin V. Bonilla, He Zhao, Daniel M. Steinberg (ICML 2026)
 
+Implementation and maintenance of the CaPE codebase by [Edwin V. Bonilla](https://github.com/ebonilla).
+
 - Pre-print: https://arxiv.org/abs/2602.01483
 - Repository: https://github.com/csiro-funml/CaPE 
 
