@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: "Causal Preference Elicitation"
+message: "If you use this code, please cite the associated paper."
+type: software
+authors:
+  - family-names: Bonilla
+    given-names: Edwin V.
+    affiliation: CSIRO's Data61
+repository-code: https://github.com/ebonilla/CausalPreferenceElicitation
+license: MIT
+date-released: 2026
+preferred-citation:
+  type: article
+  title: "Causal Preference Elicitation"
+  authors:
+    - family-names: Bonilla
+      given-names: Edwin V.
+    - family-names: Zhao
+      given-names: He
+    - family-names: Steinberg
+      given-names: Daniel M.
+  year: 2026
+  journal: arXiv
+  doi: 10.48550/arXiv.2602.01483

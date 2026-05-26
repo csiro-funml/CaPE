@@ -1,0 +1,13 @@
+{
+  "source_obs_npz": "/Users/bon136/Documents/Work/ACT Wellbeing Project/Causal Preference Elicitation/code/run_causalbench/data/causalbench/exports/weissmann_k562_observational.npz",
+  "source_oracle_npz": "/Users/bon136/Documents/Work/ACT Wellbeing Project/Causal Preference Elicitation/code/run_causalbench/data/causalbench/exports/weissmann_k562_oracle_minEff0p3.npz",
+  "k": 50,
+  "seed": 0,
+  "selection": "top-k by observational variance",
+  "standardize_X_for_ranking": false,
+  "oracle_alignment": "gene_names identical order",
+  "oracle_density_full": 0.021784307440990063,
+  "oracle_density_k": 0.0508,
+  "oracle_edges_full": 8428,
+  "oracle_edges_k": 127
+}
