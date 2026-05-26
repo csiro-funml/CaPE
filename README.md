@@ -64,8 +64,6 @@ If you use this code, please cite:
 
 Citation metadata is also available via `CITATION.cff`.
 
----
-
 ## License
 
 Licensed under the Apache License 2.0.
