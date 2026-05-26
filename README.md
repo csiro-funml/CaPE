@@ -1,11 +1,13 @@
 # Causal Preference Elicitation (CaPE)
 
-Code release for **Causal Preference Elicitation (CaPE)** (Bonilla, Zhao, Steinberg, 2026).
+Official code release for **Causal Preference Elicitation (CaPE)**  
+Edwin V. Bonilla, He Zhao, Daniel M. Steinberg (ICML 2026)
 
 - Pre-print: https://arxiv.org/abs/2602.01483
-- Repo: https://github.com/csiro-funml/CaPE 
+- Repository: https://github.com/csiro-funml/CaPE 
 
 ![Reproducible](https://img.shields.io/badge/reproducibility-one_command-brightgreen)
+![License](https://img.shields.io/badge/license-Apache%202.0-blue)
 
 ## One-command reproduction
 
@@ -47,4 +49,23 @@ Scripts for launching the synthetic and causalbench experiments in the cluster a
 
 ## Citation
 
-See `CITATION.cff`.
+If you use this code, please cite:
+
+```bibtex
+@inproceedings{bonilla2026cape,
+  title={Causal Preference Elicitation},
+  author={Bonilla, Edwin V. and Zhao, He and Steinberg, Daniel M.},
+  booktitle={International Conference on Machine Learning},
+  year={2026},
+  doi={10.48550/arXiv.2602.01483}
+}
+
+```
+
+Citation metadata is also available via `CITATION.cff`.
+
+---
+
+## License
+
+Licensed under the Apache License 2.0.
