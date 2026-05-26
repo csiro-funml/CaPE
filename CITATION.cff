@@ -5,9 +5,9 @@ type: software
 authors:
   - family-names: Bonilla
     given-names: Edwin V.
-    affiliation: CSIRO's Data61
-repository-code: https://github.com/ebonilla/CausalPreferenceElicitation
-license: MIT
+    affiliation: CSIRO
+repository-code: https://github.com/csiro-funml/CaPE
+license: 
 date-released: 2026
 preferred-citation:
   type: article
@@ -20,5 +20,5 @@ preferred-citation:
     - family-names: Steinberg
       given-names: Daniel M.
   year: 2026
-  journal: arXiv
+  journal: International Conference on Machine Learning 
   doi: 10.48550/arXiv.2602.01483
