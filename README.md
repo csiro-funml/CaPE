@@ -1,7 +1,5 @@
 # Causal Preference Elicitation (CaPE)
-<p align="center">
-  <img src="cape_logo_final.svg" width="200" />
-</p>
+<img src="cape_logo_final.svg" width="200" />
 
 Official code release for **Causal Preference Elicitation (CaPE)**  
 Edwin V. Bonilla, He Zhao, Daniel M. Steinberg (ICML 2026) 
