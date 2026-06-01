@@ -1,6 +1,6 @@
 # Causal Preference Elicitation (CaPE)
 <p align="center">
-  <img src="cape_logo_final.svg" width="120" />
+  <img src="cape_logo_final.svg" width="200" />
 </p>
 
 Official code release for **Causal Preference Elicitation (CaPE)**  
