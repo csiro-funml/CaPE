@@ -72,6 +72,8 @@ nav ul a:hover{color:var(--ink)}
 .demo-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-family:var(--sans)}
 .demo-head h3{font-size:1.08rem}
 .demo-head .count{color:var(--muted);font-size:.95rem}
+.demo-note{margin:2px 0 0;font:400 .92rem var(--sans);color:var(--muted)}
+.badge{display:inline-block;vertical-align:middle;margin-left:14px;font:600 .9rem/1 var(--sans);color:var(--amber-ink);background:#FEF5E8;border:1.5px solid var(--amber);border-radius:999px;padding:7px 13px;position:relative;top:-4px}
 .demo svg.graph{display:block;width:100%;height:auto;margin:6px 0 4px}
 .q{border-radius:16px;background:#FEF5E8;border:1.5px solid var(--amber);padding:14px 16px}
 .q p{margin:0 0 10px;font:500 1.08rem/1.35 var(--sans)}
@@ -149,9 +151,9 @@ footer img{height:84px;background:#fff;border-radius:12px;padding:6px}
     <ul>
       <li class="opt"><a href="#video">Video</a></li>
       <li><a href="#how">How it works</a></li>
-      <li class="opt"><a href="#walkthrough">How to use</a></li>
       <li><a href="#results">Results</a></li>
       <li><a href="#start">Code</a></li>
+      <li class="opt"><a href="#app">The app</a></li>
       <li><a href="#cite">Cite</a></li>
     </ul>
   </div>
@@ -179,6 +181,7 @@ footer img{height:84px;background:#fff;border-radius:12px;padding:6px}
         <h3 id="demo-title">Try it: you are the expert</h3>
         <span class="count" id="qcount">543 possible networks</span>
       </div>
+      <p class="demo-note">A simplified illustration of how CaPE updates its belief, running in your browser.</p>
       <svg class="graph" id="graph" viewBox="0 0 440 270" role="img" aria-label="Four variables and CaPE's current belief about the links between them"></svg>
       <div class="q" id="question" aria-live="polite">
         <p id="qtext">Loading…</p>
@@ -255,21 +258,6 @@ footer img{height:84px;background:#fff;border-radius:12px;padding:6px}
   </div>
 </section>
 
-<section id="walkthrough">
-  <div class="wrap">
-    <div class="prose">
-      <h2>How to use CaPE</h2>
-      <p style="margin-top:16px">A four-minute walkthrough for experts: how to read the diagram, answer CaPE’s questions, see what each answer changed, review any link yourself, rule out a direction you’re sure about, and finish with the learned graph. It is demonstrated with the Millennium Cohort Study: 13 measures for around 9,000 children, from 9 months to age 17.</p>
-    </div>
-    <div class="video-frame">
-      <video id="howto-video" controls preload="metadata" poster="assets/cape_how_to_use_poster.jpg" data-stop-before="0.8" data-ease-out="0">
-        <source src="assets/CaPE_how_to_use.mp4" type="video/mp4">
-        Your browser can’t play this video. <a href="assets/CaPE_how_to_use.mp4">Download it instead</a>.
-      </video>
-    </div>
-  </div>
-</section>
-
 <section id="results">
   <div class="wrap">
     <h2>Results</h2>
@@ -307,7 +295,8 @@ footer img{height:84px;background:#fff;border-radius:12px;padding:6px}
     <div class="cols">
       <div class="prose">
         <h2>Get started</h2>
-        <p style="margin-top:16px">The code reproduces every experiment in the paper with one command. CaPE works with posterior samples from any causal discovery method, so you can plug in your own.</p>
+        <p style="margin-top:16px">This repository contains the CaPE algorithm and the code to reproduce every experiment in the paper with one command. CaPE works with posterior samples from any causal discovery method, so you can plug in your own.</p>
+        <p>The interactive app shown below is not part of this repository.</p>
         <p>See the <a href="https://github.com/csiro-funml/CaPE#readme">README</a> for the repository layout and experiment entry points, and <a href="https://github.com/csiro-funml/CaPE/blob/main/REPRODUCIBILITY.md">REPRODUCIBILITY.md</a> for details. Released under the Apache 2.0 licence.</p>
       </div>
       <div>
@@ -324,6 +313,22 @@ pip install -r requirements.txt
 <span class="c"># or run one experiment</span>
 python experiments/run_sachs_hitl.py</code></pre>
       </div>
+    </div>
+  </div>
+</section>
+
+<section id="app">
+  <div class="wrap">
+    <div class="prose">
+      <h2>The CaPE app <span class="badge">Available to collaborators</span></h2>
+      <p style="margin-top:16px">We have built an interactive app on top of the CaPE algorithm for running elicitation sessions with domain experts. This walkthrough shows how an expert uses it: reading the diagram, answering CaPE’s questions, seeing what each answer changed, reviewing any link themselves, ruling out a direction they are sure about, and finishing with the learned graph. It is demonstrated with the Millennium Cohort Study: 13 measures for around 9,000 children, from 9 months to age 17.</p>
+      <p>The app is currently available to our collaborators only. If you would like to use it on your own causal question, get in touch at <a href="mailto:edwin.bonilla@csiro.au">edwin.bonilla@csiro.au</a>.</p>
+    </div>
+    <div class="video-frame">
+      <video id="howto-video" controls preload="metadata" poster="assets/cape_how_to_use_poster.jpg" data-stop-before="0.8" data-ease-out="0">
+        <source src="assets/CaPE_how_to_use.mp4" type="video/mp4">
+        Your browser can’t play this video. <a href="assets/CaPE_how_to_use.mp4">Download it instead</a>.
+      </video>
     </div>
   </div>
 </section>
@@ -354,7 +359,8 @@ python experiments/run_sachs_hitl.py</code></pre>
   <div class="wrap">
     <div>
       <p style="margin:0 0 6px">CaPE: Causal Preference Elicitation. Bonilla, Zhao and Steinberg, ICML 2026.</p>
-      <p style="margin:0">Questions about the paper or code? <a href="https://github.com/csiro-funml/CaPE/issues">Open an issue on GitHub</a> or email <a href="mailto:edwin.bonilla@csiro.au">edwin.bonilla@csiro.au</a>.</p>
+      <p style="margin:0 0 6px">Questions about the paper or code? <a href="https://github.com/csiro-funml/CaPE/issues">Open an issue on GitHub</a> or email <a href="mailto:edwin.bonilla@csiro.au">edwin.bonilla@csiro.au</a>.</p>
+      <p style="margin:0">Interested in using the CaPE app? Email <a href="mailto:edwin.bonilla@csiro.au">edwin.bonilla@csiro.au</a>.</p>
     </div>
     <img src="assets/cape_logo.svg" alt="CaPE logo">
   </div>
