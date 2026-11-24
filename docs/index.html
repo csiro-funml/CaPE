@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CaPE: Causal Preference Elicitation</title>
+<meta name="description" content="CaPE is a Bayesian framework for expert-in-the-loop causal discovery: it asks an expert only about the causal links the data can't settle. ICML 2026.">
+<meta property="og:title" content="CaPE: Causal Preference Elicitation">
+<meta property="og:description" content="Ask experts only what the data can't tell you. Bayesian expert-in-the-loop causal discovery (ICML 2026).">
+<meta property="og:image" content="assets/cape_promo_poster.jpg">
+<link rel="icon" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1B2A4A;      /* logo navy */
+  --deep:#1A7A8A;     /* logo deep teal */
+  --cyan:#2AB3C5;     /* logo cyan */
+  --amber:#F4A130;    /* logo amber: the expert's question */
+  --amber-ink:#9A5B07;
+  --paper:#FFFFFF;
+  --mist:#F1F6F7;     /* cool off-white, from the logo's pale rings */
+  --line:#D5E3E6;
+  --muted:#56657F;
+  --sans:"Outfit",system-ui,sans-serif;
+  --serif:"Source Serif 4",Georgia,serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 1.125rem/1.6 var(--serif);-webkit-font-smoothing:antialiased}
+a{color:var(--deep);text-underline-offset:.18em}
+a:hover{color:var(--ink)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:4px}
+h1,h2,h3{font-family:var(--sans);color:var(--ink);margin:0}
+h2{font-size:clamp(1.75rem,1.2rem + 1.6vw,2.4rem);font-weight:800;letter-spacing:-.01em;line-height:1.15}
+h3{font-size:1.2rem;font-weight:600}
+.wrap{max-width:1160px;margin:0 auto;padding:0 28px}
+.prose{max-width:66ch}
+.prose p{margin:0 0 1em}
+section{padding:96px 0}
+section+section{border-top:1px solid var(--line)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:20px}
+.brand{font:800 1.5rem/1 var(--sans);color:var(--ink);text-decoration:none;letter-spacing:-.01em}
+.brand span{color:var(--cyan)}
+nav ul{list-style:none;display:flex;gap:26px;margin:0;padding:0;font:500 .98rem var(--sans)}
+nav ul a{color:var(--muted);text-decoration:none}
+nav ul a:hover{color:var(--ink)}
+@media (max-width:640px){nav ul{gap:14px;font-size:.9rem}nav ul li.opt{display:none}}
+
+/* hero */
+.hero{padding:72px 0 88px;background:var(--mist)}
+.hero .wrap{display:grid;grid-template-columns:1fr 1.05fr;gap:56px;align-items:center}
+@media (max-width:960px){.hero .wrap{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(2.5rem,1.6rem + 3vw,4rem);font-weight:800;line-height:1.04;letter-spacing:-.025em;max-width:14ch}
+.lede{font-size:1.25rem;line-height:1.55;margin:26px 0 22px;max-width:46ch}
+.authors{font:500 1.02rem/1.5 var(--sans);color:var(--muted);margin:0 0 30px}
+.authors b{color:var(--ink);font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:9px;font:600 1rem var(--sans);padding:12px 20px;border-radius:999px;text-decoration:none;border:2px solid var(--ink);color:var(--ink);background:var(--paper)}
+.btn:hover{background:var(--ink);color:#fff}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.primary:hover{background:var(--deep);border-color:var(--deep)}
+.btn svg{width:18px;height:18px}
+
+/* demo */
+.demo{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:22px 22px 18px;box-shadow:0 24px 60px -30px rgba(27,42,74,.35)}
+.demo-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-family:var(--sans)}
+.demo-head h3{font-size:1.08rem}
+.demo-head .count{color:var(--muted);font-size:.95rem}
+.demo svg.graph{display:block;width:100%;height:auto;margin:6px 0 4px}
+.q{border-radius:16px;background:#FEF5E8;border:1.5px solid var(--amber);padding:14px 16px}
+.q p{margin:0 0 10px;font:500 1.08rem/1.35 var(--sans)}
+.q .opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (max-width:480px){.q .opts{grid-template-columns:1fr}}
+.q button{font:600 .98rem var(--sans);padding:10px 8px;border-radius:12px;border:1.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
+.q button:hover{background:var(--ink);color:#fff}
+.meters{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;font-family:var(--sans)}
+.meter label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:6px}
+.bar{height:10px;border-radius:6px;background:var(--mist);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--cyan);border-radius:6px;transition:width .5s ease}
+.meter b{font-weight:600;font-size:1.05rem}
+.topgraphs{display:flex;align-items:flex-end;gap:5px;height:44px}
+.topgraphs i{flex:1;background:#BFE3E8;border-radius:3px 3px 0 0;transition:height .5s ease}
+.topgraphs i:first-child{background:var(--amber)}
+.demo-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font:400 .9rem var(--sans);color:var(--muted);gap:10px;flex-wrap:wrap}
+.linkbtn{font:600 .9rem var(--sans);color:var(--deep);background:none;border:0;padding:4px 0;cursor:pointer;text-decoration:underline;text-underline-offset:.18em}
+.status{min-height:1.4em}
+
+/* video */
+.video-frame{margin-top:36px;border-radius:20px;overflow:hidden;background:var(--ink);aspect-ratio:16/9}
+.video-frame video{width:100%;height:100%;display:block}
+
+/* loop */
+.loop{list-style:none;margin:44px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+@media (max-width:860px){.loop{grid-template-columns:1fr 1fr;row-gap:36px}}
+@media (max-width:520px){.loop{grid-template-columns:1fr}.loop .n::after{display:none}}
+.loop li{padding:0 26px 0 0;position:relative}
+.loop .n{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.loop .n span{width:44px;height:44px;border-radius:50%;border:2.5px solid var(--cyan);display:grid;place-items:center;font:800 1.15rem var(--sans);color:var(--deep);background:#fff;flex:none}
+.loop li:nth-child(3) .n span{border-color:var(--amber);color:var(--amber-ink)}
+.loop .n::after{content:"";flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 8px,transparent 8px 14px)}
+.loop li:last-child .n::after{background:none}
+.loop p{margin:8px 0 0;font-size:1.02rem;line-height:1.55;color:#33415E}
+.repeat{margin-top:30px;font:500 1rem var(--sans);color:var(--muted)}
+.repeat svg{vertical-align:-5px;margin-right:6px}
+
+/* results */
+.headline{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center;margin-top:40px}
+@media (max-width:900px){.headline{grid-template-columns:1fr}}
+.claim{font:600 clamp(1.5rem,1.1rem + 1.4vw,2.15rem)/1.28 var(--sans);letter-spacing:-.01em;margin:0}
+.claim em{font-style:normal;color:var(--deep)}
+.note{font-size:.98rem;color:var(--muted);margin-top:18px;max-width:58ch}
+figure{margin:0}
+figcaption{font-size:.95rem;color:var(--muted);margin-top:10px;line-height:1.5}
+.chart{background:var(--mist);border-radius:20px;padding:20px 16px 8px}
+.chart svg{width:100%;height:auto;display:block}
+.more{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:64px}
+@media (max-width:860px){.more{grid-template-columns:1fr}}
+.more img{width:100%;height:auto;border:1px solid var(--line);border-radius:14px;background:#fff;padding:10px}
+.more h3{margin-bottom:12px}
+
+/* code */
+pre{background:var(--ink);color:#E6F1F3;border-radius:16px;padding:20px 22px;overflow:auto;font:400 .95rem/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin:22px 0 0;position:relative}
+pre .c{color:#8FB6BE}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:8px}
+@media (max-width:860px){.cols{grid-template-columns:1fr}}
+.copy{position:absolute;top:12px;right:12px;font:600 .85rem var(--sans);background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 10px;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.2)}
+
+/* let grid children shrink so code blocks scroll instead of overflowing */
+.cols>*,.headline>*,.hero .wrap>*,.more>*{min-width:0}
+footer{background:var(--ink);color:#C9D6E3;padding:48px 0;font:400 .98rem/1.6 var(--sans)}
+footer a{color:#fff}
+footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
+footer img{height:84px;background:#fff;border-radius:12px;padding:6px}
+</style>
+</head>
+<body>
+
+<nav aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="#top">Ca<span>PE</span></a>
+    <ul>
+      <li class="opt"><a href="#video">Video</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#start">Code</a></li>
+      <li><a href="#cite">Cite</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <h1>Ask experts only what the data can’t tell you</h1>
+      <p class="lede">CaPE is a Bayesian framework for expert-in-the-loop causal discovery. It starts from what the data say about cause and effect, asks an expert about the links it is least sure of, and treats every answer as evidence rather than fact.</p>
+      <p class="authors"><b>Edwin V. Bonilla, He Zhao and Daniel M. Steinberg</b><br>CSIRO, Australia. Proceedings of ICML 2026.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://arxiv.org/abs/2602.01483">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg>
+          Read the paper</a>
+        <a class="btn" href="https://github.com/csiro-funml/CaPE">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.29-1.69-1.29-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+          Get the code</a>
+        <a class="btn" href="#cite">Cite</a>
+      </div>
+    </div>
+
+    <div class="demo" aria-labelledby="demo-title">
+      <div class="demo-head">
+        <h3 id="demo-title">Try it: you are the expert</h3>
+        <span class="count" id="qcount">543 possible networks</span>
+      </div>
+      <svg class="graph" id="graph" viewBox="0 0 440 270" role="img" aria-label="Four variables and CaPE's current belief about the links between them"></svg>
+      <div class="q" id="question" aria-live="polite">
+        <p id="qtext">Loading…</p>
+        <div class="opts" id="qopts"></div>
+      </div>
+      <div class="meters">
+        <div class="meter">
+          <label for="cert">How sure CaPE is about the whole network</label>
+          <div class="bar"><i id="certbar"></i></div>
+          <b id="cert">0%</b>
+        </div>
+        <div class="meter">
+          <label>Belief in the five most likely networks</label>
+          <div class="topgraphs" id="top5" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+      </div>
+      <div class="demo-foot">
+        <span class="status" id="status">Thicker arrows mean CaPE is more confident in that direction.</span>
+        <span>
+          <button class="linkbtn" id="reveal" type="button">Show the true network</button>
+          &nbsp;
+          <button class="linkbtn" id="reset" type="button">Start again</button>
+        </span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="video">
+  <div class="wrap">
+    <div class="prose">
+      <h2>CaPE in a minute</h2>
+      <p style="margin-top:16px">Why the direction of a causal link matters for decisions, and how CaPE uses expert time where it counts.</p>
+    </div>
+    <div class="video-frame">
+      <video controls preload="metadata" poster="assets/cape_promo_poster.jpg">
+        <source src="assets/cape_promo.mp4" type="video/mp4">
+        Your browser can’t play this video. <a href="assets/cape_promo.mp4">Download it instead</a>.
+      </video>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="prose">
+      <h2>How CaPE works</h2>
+      <p style="margin-top:16px">Observational data often narrow down which variables are linked, but leave the direction of many links open. Experts can settle those links, but their time is scarce and their judgements are not perfect. CaPE spends each question where it will reduce uncertainty about the whole graph the most.</p>
+    </div>
+    <ol class="loop">
+      <li>
+        <div class="n"><span>1</span></div>
+        <h3>Start from the data</h3>
+        <p>Take samples from any observational posterior over causal graphs: bootstrap, MCMC, variational or a GFlowNet. CaPE holds them as weighted particles.</p>
+      </li>
+      <li>
+        <div class="n"><span>2</span></div>
+        <h3>Choose the question</h3>
+        <p>Score each pair of variables by the expected information gain of the expert’s answer. It is high where the candidate graphs confidently disagree.</p>
+      </li>
+      <li>
+        <div class="n"><span>3</span></div>
+        <h3>Ask the expert</h3>
+        <p>The expert says whether A causes B, B causes A, or neither. A three-way likelihood models how reliable and decisive their answers are.</p>
+      </li>
+      <li>
+        <div class="n"><span>4</span></div>
+        <h3>Update the belief</h3>
+        <p>Reweight the particles by the answer, resample when a few dominate, and rejuvenate with small MCMC moves to keep the set diverse.</p>
+      </li>
+    </ol>
+    <p class="repeat"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A7A8A" stroke-width="2.2" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.3L3 16M3 21v-5h5"/></svg>Repeat until the question budget is spent. Under non-adversarial feedback, the posterior provably concentrates on the true graph, up to what the data can identify.</p>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <h2>Results</h2>
+    <div class="headline">
+      <div>
+        <p class="claim">For a protein-signalling problem from human immune cells, there are more than 10<sup>22</sup> possible cause-and-effect networks. With just twenty expert questions, CaPE <em>more than doubled the accuracy of the causal directions</em>.</p>
+        <p class="note">Sachs observational-only benchmark: 11 variables, 853 samples, 17-edge reference network. Orientation F1 rose from 0.22 to 0.50 after 20 queries and to 0.60 after 40. Expert answers were simulated from the reference network. Means over 10 runs (Table 3 of the paper).</p>
+      </div>
+      <figure class="chart">
+        <svg id="f1chart" viewBox="0 0 520 350" role="img" aria-labelledby="f1title f1desc">
+          <title id="f1title">Orientation F1 against number of expert questions on the Sachs data</title>
+          <desc id="f1desc">CaPE rises from 0.22 to 0.50 after 20 questions and 0.60 after 40, ahead of choosing the most uncertain pair (0.45, 0.56) and random questions (0.42, 0.55).</desc>
+        </svg>
+        <figcaption>Accuracy of causal directions (orientation F1) as expert questions accumulate. CaPE’s information-based choice pulls ahead most clearly at small budgets.</figcaption>
+      </figure>
+    </div>
+
+    <div class="more">
+      <figure>
+        <h3>Synthetic graphs</h3>
+        <img src="assets/fig_synthetic.png" alt="Three panels for 20-variable synthetic graphs over 190 rounds: CaPE reaches near-zero entropy and structural error, and near-certain probability on the true graph, faster than uncertainty sampling, random and static baselines." loading="lazy">
+        <figcaption>On 20-variable random graphs, CaPE drives structural error to almost zero, while random questioning is still far from the truth after 190 rounds.</figcaption>
+      </figure>
+      <figure>
+        <h3>Human gene perturbations</h3>
+        <img src="assets/fig_causalbench.png" alt="Two panels for the CausalBench K562 50-gene benchmark over 200 queries: CaPE's directed AUPRC and top-K precision keep rising, while baselines plateau or decline." loading="lazy">
+        <figcaption>On a 50-gene CausalBench benchmark, CaPE keeps improving with more questions and clearly outperforms all baselines from about 100 queries.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <div class="cols">
+      <div class="prose">
+        <h2>Get started</h2>
+        <p style="margin-top:16px">The code reproduces every experiment in the paper with one command. CaPE works with posterior samples from any causal discovery method, so you can plug in your own.</p>
+        <p>See the <a href="https://github.com/csiro-funml/CaPE#readme">README</a> for the repository layout and experiment entry points, and <a href="https://github.com/csiro-funml/CaPE/blob/main/REPRODUCIBILITY.md">REPRODUCIBILITY.md</a> for details. Released under the Apache 2.0 licence.</p>
+      </div>
+      <div>
+<pre><code><span class="c"># clone and set up</span>
+git clone https://github.com/csiro-funml/CaPE.git
+cd CaPE
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+<span class="c"># reproduce the paper</span>
+./reproduce_paper.sh
+
+<span class="c"># or run one experiment</span>
+python experiments/run_sachs_hitl.py</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cite">
+  <div class="wrap">
+    <div class="prose"><h2>Cite CaPE</h2></div>
+<pre id="bibtex"><button class="copy" type="button" data-copy="bibtex">Copy</button><code>@inproceedings{bonilla2026cape,
+  title     = {Causal Preference Elicitation},
+  author    = {Bonilla, Edwin V. and Zhao, He and Steinberg, Daniel M.},
+  booktitle = {International Conference on Machine Learning},
+  year      = {2026},
+  doi       = {10.48550/arXiv.2602.01483}
+}</code></pre>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <p style="margin:0 0 6px">CaPE: Causal Preference Elicitation. Bonilla, Zhao and Steinberg, ICML 2026.</p>
+      <p style="margin:0">Questions about the paper or code? <a href="https://github.com/csiro-funml/CaPE/issues">Open an issue on GitHub</a> or email <a href="mailto:edwin.bonilla@csiro.au">edwin.bonilla@csiro.au</a>.</p>
+    </div>
+    <img src="assets/cape_logo.svg" alt="CaPE logo">
+  </div>
+</footer>
+
+<script>
+/* ---------- Live demo: exact Bayesian updating over all 543 DAGs on 4 variables ---------- */
+(function(){
+  const N = ["X1","X2","X3","X4"];
+  const POS = [[90,135],[220,45],[220,225],[350,135]];
+  const PAIRS = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]];
+  // state per pair: 0 = no link, 1 = i→j, 2 = j→i
+  const TRUE = [1,1,0,0,1,1]; // X1→X2, X1→X3, X2→X4, X3→X4 (the logo's graph)
+  const ACC = 0.8;            // simulated expert reliability: right answer 80%, each wrong one 10%
+
+  function acyclic(s){
+    const adj=[[],[],[],[]], indeg=[0,0,0,0];
+    PAIRS.forEach(([i,j],k)=>{ if(s[k]===1){adj[i].push(j);indeg[j]++;} else if(s[k]===2){adj[j].push(i);indeg[i]++;} });
+    const q=[]; indeg.forEach((d,v)=>{if(!d)q.push(v);}); let seen=0;
+    while(q.length){const v=q.pop();seen++;adj[v].forEach(u=>{if(!--indeg[u])q.push(u);});}
+    return seen===4;
+  }
+  const G=[];
+  for(let c=0;c<729;c++){const s=[];let x=c;for(let k=0;k<6;k++){s.push(x%3);x=Math.floor(x/3);} if(acyclic(s))G.push(s);}
+
+  // "Observational posterior": data pin down which pairs are linked fairly well, but not the directions.
+  function prior(){
+    const w=G.map(s=>{let skel=0,dir=0;
+      s.forEach((v,k)=>{const t=TRUE[k]; if((v>0)!==(t>0))skel++; else if(v>0&&v!==t)dir++;});
+      return Math.exp(-1.7*skel-0.15*dir);});
+    const z=w.reduce((a,b)=>a+b,0); return w.map(v=>v/z);
+  }
+  const H=p=>p.reduce((a,v)=>v>0?a-v*Math.log(v):a,0);
+  const lik=(s,k,y)=>s[k]===y?ACC:(1-ACC)/2;
+  let W, asked, current, revealed=false, H0;
+
+  function marg(k){const m=[0,0,0];G.forEach((s,g)=>m[s[k]]+=W[g]);return m;}
+  function eig(k){return H(marg(k).map(p=>p*ACC+(1-p)*(1-ACC)/2)) - H([ACC,(1-ACC)/2,(1-ACC)/2]);}
+  function pick(){let best=0,bk=0;PAIRS.forEach((_,k)=>{const e=eig(k);if(e>best+1e-9){best=e;bk=k;}});return best<0.01?null:bk;}
+
+  const svg=document.getElementById("graph"), NS="http://www.w3.org/2000/svg";
+  function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e;}
+  function draw(){
+    svg.innerHTML="";
+    const defs=el("defs",{});
+    [["c","#1A7A8A"],["t","#9DB3BA"],["a","#F4A130"]].forEach(([id,col])=>{
+      const m=el("marker",{id:"ah"+id,viewBox:"0 0 10 10",refX:"8.5",refY:"5",markerWidth:"15",markerHeight:"15",markerUnits:"userSpaceOnUse",orient:"auto-start-reverse"},defs);
+      el("path",{d:"M0,0 L10,5 L0,10 z",fill:col},m);});
+    el("circle",{cx:220,cy:135,r:118,fill:"none",stroke:"#E3EEF0","stroke-width":1.5});
+    PAIRS.forEach(([i,j],k)=>{
+      const m=marg(k), [x1,y1]=POS[i],[x2,y2]=POS[j];
+      const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,px=-uy,py=ux,r=31;
+      if(current===k){ el("line",{x1,y1,x2,y2,stroke:"#F4A130","stroke-opacity":.28,"stroke-width":26,"stroke-linecap":"round"}); }
+      [[1,i,j],[2,j,i]].forEach(([st,a,b],n)=>{
+        const p=m[st]; if(p<0.04)return;
+        const [ax,ay]=POS[a],[bx,by]=POS[b]; const off=(n?-1:1)*6*(m[1]>0.04&&m[2]>0.04?1:0);
+        const vx=(bx-ax)/L,vy=(by-ay)/L;
+        el("line",{x1:ax+vx*r+px*off,y1:ay+vy*r+py*off,x2:bx-vx*(r+4)+px*off,y2:by-vy*(r+4)+py*off,
+          stroke:p>0.5?"#1A7A8A":"#9DB3BA","stroke-width":(1.5+6*p).toFixed(2),"stroke-opacity":(0.25+0.75*p).toFixed(2),
+          "marker-end":`url(#ah${p>0.5?"c":"t"})`,"stroke-linecap":"round"});
+      });
+      if(revealed&&TRUE[k]){const [a,b]=TRUE[k]===1?[i,j]:[j,i];const [ax,ay]=POS[a],[bx,by]=POS[b];const vx=(bx-ax)/L,vy=(by-ay)/L;
+        el("line",{x1:ax+vx*r,y1:ay+vy*r,x2:bx-vx*(r+4),y2:by-vy*(r+4),stroke:"#F4A130","stroke-width":2,"stroke-dasharray":"5 5","marker-end":"url(#aha)"});}
+    });
+    POS.forEach(([x,y],v)=>{
+      const hl=current!=null&&PAIRS[current].includes(v);
+      el("circle",{cx:x,cy:y,r:28,fill:"#fff",stroke:hl?"#F4A130":(v===0?"#1A7A8A":"#2AB3C5"),"stroke-width":3});
+      const t=el("text",{x,y:y+7,"text-anchor":"middle","font-family":"Outfit, sans-serif","font-size":20,"font-weight":600,fill:hl?"#9A5B07":"#1A7A8A"});
+      t.textContent=N[v];
+    });
+  }
+  function meters(){
+    const h=H(W), cert=Math.max(0,1-h/H0);
+    document.getElementById("certbar").style.width=(cert*100).toFixed(0)+"%";
+    document.getElementById("cert").textContent=(cert*100).toFixed(0)+"%";
+    const top=[...W].sort((a,b)=>b-a).slice(0,5), mx=Math.max(top[0],0.2);
+    document.querySelectorAll("#top5 i").forEach((e,n)=>e.style.height=(8+92*top[n]/mx)+"%");
+    document.getElementById("qcount").textContent=asked===1?"1 question asked":asked+" questions asked";
+    if(!asked)document.getElementById("qcount").textContent=G.length+" possible networks";
+  }
+  function ask(){
+    current=pick(); draw(); meters();
+    const qt=document.getElementById("qtext"), qo=document.getElementById("qopts"); qo.innerHTML="";
+    if(current==null){qt.textContent="CaPE is now confident about every link. No question is worth asking.";return;}
+    const [i,j]=PAIRS[current];
+    qt.textContent=`Which is true for ${N[i]} and ${N[j]}?`;
+    [[`${N[i]} → ${N[j]}`,1],[`${N[j]} → ${N[i]}`,2],["No direct link",0]].forEach(([lab,y])=>{
+      const b=document.createElement("button"); b.type="button"; b.textContent=lab; b.onclick=()=>answer(y); qo.appendChild(b);});
+  }
+  function answer(y){
+    W=W.map((w,g)=>w*lik(G[g],current,y)); const z=W.reduce((a,b)=>a+b,0); W=W.map(v=>v/z);
+    asked++;
+    const [i,j]=PAIRS[current];
+    document.getElementById("status").textContent=`Answer noted for ${N[i]} and ${N[j]}. Networks that agree gained weight.`;
+    ask();
+  }
+  function reset(){W=prior();H0=H(W);asked=0;document.getElementById("status").textContent="Thicker arrows mean CaPE is more confident in that direction.";ask();}
+  document.getElementById("reset").onclick=reset;
+  document.getElementById("reveal").onclick=e=>{revealed=!revealed;e.target.textContent=revealed?"Hide the true network":"Show the true network";draw();};
+  reset();
+})();
+
+/* ---------- Results chart: Table 3, Sachs, orientation F1 ---------- */
+(function(){
+  const svg=document.getElementById("f1chart"),NS="http://www.w3.org/2000/svg";
+  const X=[0,5,10,20,40];
+  const S=[
+    {name:"CaPE",col:"#1A7A8A",w:4.5,v:[0.218,0.300,0.357,0.495,0.600]},
+    {name:"Most uncertain pair",col:"#2AB3C5",w:2.5,v:[0.218,0.311,0.368,0.453,0.555]},
+    {name:"Random pair",col:"#8C99AE",w:2.5,v:[0.218,0.307,0.363,0.423,0.545]}];
+  const x0=56,x1=470,y0=290,y1=24,sx=x=>x0+(x1-x0)*x/40,sy=v=>y0-(y0-y1)*(v-0.2)/0.45;
+  function el(t,a,txt){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;svg.appendChild(e);return e;}
+  [0.2,0.3,0.4,0.5,0.6].forEach(v=>{el("line",{x1:x0,x2:x1,y1:sy(v),y2:sy(v),stroke:"#D5E3E6"});
+    el("text",{x:x0-10,y:sy(v)+5,"text-anchor":"end","font-family":"Outfit, sans-serif","font-size":14,fill:"#56657F"},v.toFixed(1));});
+  X.forEach(x=>el("text",{x:sx(x),y:y0+24,"text-anchor":"middle","font-family":"Outfit, sans-serif","font-size":14,fill:"#56657F"},x));
+  el("text",{x:(x0+x1)/2,y:y0+44,"text-anchor":"middle","font-family":"Outfit, sans-serif","font-size":14,fill:"#56657F"},"Expert questions");
+  el("line",{x1:sx(20),x2:sx(20),y1:y1,y2:y0,stroke:"#F4A130","stroke-dasharray":"4 5","stroke-width":1.5});
+  S.slice().reverse().forEach(s=>{
+    el("polyline",{points:X.map((x,i)=>sx(x)+","+sy(s.v[i])).join(" "),fill:"none",stroke:s.col,"stroke-width":s.w,"stroke-linejoin":"round","stroke-linecap":"round"});
+    X.forEach((x,i)=>el("circle",{cx:sx(x),cy:sy(s.v[i]),r:s.name==="CaPE"?5:3.5,fill:s.col}));
+  });
+  [["CaPE","#1A7A8A",4.5],["Most uncertain pair","#2AB3C5",2.5],["Random pair","#8C99AE",2.5]].forEach(([n,c,w],i)=>{
+    el("line",{x1:sx(20)+24,x2:sx(20)+50,y1:sy(0.36)+i*22,y2:sy(0.36)+i*22,stroke:c,"stroke-width":w,"stroke-linecap":"round"});
+    el("text",{x:sx(20)+58,y:sy(0.36)+5+i*22,"font-family":"Outfit, sans-serif","font-size":14,fill:"#33415E","font-weight":i?400:600},n);});
+  el("text",{x:sx(20)-10,y:sy(0.495)-12,"text-anchor":"end","font-family":"Outfit, sans-serif","font-size":15,"font-weight":600,fill:"#1A7A8A"},"0.50 after 20 questions");
+    el("text",{x:sx(0)+16,y:sy(0.2)-8,"font-family":"Outfit, sans-serif","font-size":13,fill:"#56657F"},"data only 0.22");
+})();
+
+/* ---------- Copy buttons ---------- */
+document.querySelectorAll(".copy").forEach(b=>b.addEventListener("click",()=>{
+  const t=document.querySelector("#"+b.dataset.copy+" code").innerText;
+  navigator.clipboard.writeText(t).then(()=>{b.textContent="Copied";setTimeout(()=>b.textContent="Copy",1600);});
+}));
+</script>
+</body>
+</html>
