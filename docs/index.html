@@ -467,6 +467,9 @@ python experiments/run_sachs_hitl.py</code></pre>
     el("text",{x:sx(0)+16,y:sy(0.2)-8,"font-family":"Outfit, sans-serif","font-size":13,fill:"#56657F"},"data only 0.22");
 })();
 
+/* ---------- Video: show the title card again when it finishes ---------- */
+document.querySelectorAll(".video-frame video").forEach(v=>v.addEventListener("ended",()=>v.load()));
+
 /* ---------- Copy buttons ---------- */
 document.querySelectorAll(".copy").forEach(b=>b.addEventListener("click",()=>{
   const t=document.querySelector("#"+b.dataset.copy+" code").innerText;
