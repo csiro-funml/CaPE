@@ -92,7 +92,7 @@ nav ul a:hover{color:var(--ink)}
 .status{min-height:1.4em}
 
 /* video */
-.video-frame{margin-top:36px;border-radius:20px;overflow:hidden;background:var(--ink);aspect-ratio:16/9}
+.video-frame{margin-top:36px;border-radius:20px;overflow:hidden;background:#F9F6EF;aspect-ratio:16/9}
 .video-frame video{width:100%;height:100%;display:block}
 
 /* loop */
@@ -467,10 +467,22 @@ python experiments/run_sachs_hitl.py</code></pre>
     el("text",{x:sx(0)+16,y:sy(0.2)-8,"font-family":"Outfit, sans-serif","font-size":13,fill:"#56657F"},"data only 0.22");
 })();
 
-/* ---------- Video: when it finishes, keep the final slide on screen ---------- */
-document.querySelectorAll(".video-frame video").forEach(v=>v.addEventListener("ended",()=>{
-  v.poster="assets/cape_promo_end.jpg"; v.load();
-}));
+/* ---------- Video: stop on the final slide (the last second of the file fades out) ---------- */
+document.querySelectorAll(".video-frame video").forEach(v=>{
+  const HOLD=1.0;           // seconds before the end where the final slide is complete
+  let done=false, vol=1;
+  const stopAt=()=>v.duration-HOLD;
+  v.addEventListener("timeupdate",()=>{
+    if(!v.duration||v.seeking||v.paused)return;
+    const left=stopAt()-v.currentTime;
+    if(left<1.5&&left>0)v.volume=vol*Math.max(0,left/1.5);   // ease the music out
+    else if(left>=1.5&&v.volume!==vol)v.volume=vol;          // restore after seeking back
+    if(left<=0){done=true;v.pause();v.currentTime=stopAt();v.volume=vol;}
+  });
+  v.addEventListener("ended",()=>{done=true;v.currentTime=stopAt();});
+  v.addEventListener("play",()=>{if(done){done=false;v.currentTime=0;}vol=v.volume||1;});
+  v.addEventListener("volumechange",()=>{if(!v.paused&&v.currentTime<stopAt()-1.5)vol=v.volume;});
+});
 
 /* ---------- Copy buttons ---------- */
 document.querySelectorAll(".copy").forEach(b=>b.addEventListener("click",()=>{
