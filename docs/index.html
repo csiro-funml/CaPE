@@ -127,6 +127,7 @@ figcaption{font-size:.95rem;color:var(--muted);margin-top:10px;line-height:1.5}
 /* code */
 pre{background:var(--ink);color:#E6F1F3;border-radius:16px;padding:20px 22px;overflow:auto;font:400 .95rem/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin:22px 0 0;position:relative}
 pre .c{color:#8FB6BE}
+#bibtex code{white-space:pre-wrap;overflow-wrap:anywhere}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:8px}
 @media (max-width:860px){.cols{grid-template-columns:1fr}}
 .copy{position:absolute;top:12px;right:12px;font:600 .85rem var(--sans);background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 10px;cursor:pointer}
@@ -162,7 +163,7 @@ footer img{height:84px;background:#fff;border-radius:12px;padding:6px}
       <p class="lede">CaPE is a Bayesian framework for expert-in-the-loop causal discovery. It starts from what the data say about cause and effect, asks an expert about the links it is least sure of, and treats every answer as evidence rather than fact.</p>
       <p class="authors"><b>Edwin V. Bonilla, He Zhao and Daniel M. Steinberg</b><br>CSIRO, Australia. Proceedings of ICML 2026.</p>
       <div class="actions">
-        <a class="btn primary" href="https://arxiv.org/abs/2602.01483">
+        <a class="btn primary" href="https://proceedings.mlr.press/v306/bonilla26a.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg>
           Read the paper</a>
         <a class="btn" href="https://github.com/csiro-funml/CaPE">
@@ -314,12 +315,20 @@ python experiments/run_sachs_hitl.py</code></pre>
 <section id="cite">
   <div class="wrap">
     <div class="prose"><h2>Cite CaPE</h2></div>
-<pre id="bibtex"><button class="copy" type="button" data-copy="bibtex">Copy</button><code>@inproceedings{bonilla2026cape,
-  title     = {Causal Preference Elicitation},
-  author    = {Bonilla, Edwin V. and Zhao, He and Steinberg, Daniel M.},
-  booktitle = {International Conference on Machine Learning},
-  year      = {2026},
-  doi       = {10.48550/arXiv.2602.01483}
+<pre id="bibtex"><button class="copy" type="button" data-copy="bibtex">Copy</button><code>@InProceedings{pmlr-v306-bonilla26a,
+  title = 	 {Causal Preference Elicitation},
+  author =       {Bonilla, Edwin V. and Zhao, He and Steinberg, Daniel M.},
+  booktitle = 	 {Proceedings of the 43rd International Conference on Machine Learning},
+  pages = 	 {9094--9128},
+  year = 	 {2026},
+  editor = 	 {Zhang, Tong and Dudik, Miroslav and Jaggi, Martin and Agarwal, Alekh and Li, Sharon and Schuurmans, Dale and Zhu, Jerry and Berkenkamp, Felix and Dong, Hanze and Bietti, Alberto},
+  volume = 	 {306},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {06--11 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {https://raw.githubusercontent.com/mlresearch/v306/main/assets/bonilla26a/bonilla26a.pdf},
+  url = 	 {https://proceedings.mlr.press/v306/bonilla26a.html},
+  abstract = 	 {We propose causal preference elicitation, a Bayesian framework for expert-in-the-loop causal discovery that actively queries local edge relations to concentrate a posterior over directed acyclic graphs (DAGs). From any black-box observational posterior, we model noisy expert judgments with a three-way likelihood over edge existence and direction. Posterior inference uses a flexible particle approximation, and queries are selected by an efficient expected information gain criterion on the expert’s categorical response. Experiments on synthetic graphs, protein signaling data, and a human gene perturbation benchmark show faster posterior concentration and improved recovery of directed effects under tight query budgets.}
 }</code></pre>
   </div>
 </section>
