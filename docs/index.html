@@ -149,6 +149,7 @@ footer img{height:84px;background:#fff;border-radius:12px;padding:6px}
     <ul>
       <li class="opt"><a href="#video">Video</a></li>
       <li><a href="#how">How it works</a></li>
+      <li class="opt"><a href="#walkthrough">How to use</a></li>
       <li><a href="#results">Results</a></li>
       <li><a href="#start">Code</a></li>
       <li><a href="#cite">Cite</a></li>
@@ -214,7 +215,7 @@ footer img{height:84px;background:#fff;border-radius:12px;padding:6px}
       <p style="margin-top:16px">Why causal structures matter and how CaPE uses expert time where it counts.</p>
     </div>
     <div class="video-frame">
-      <video controls preload="metadata" poster="assets/cape_promo_poster.jpg">
+      <video id="promo-video" controls preload="metadata" poster="assets/cape_promo_poster.jpg" data-stop-before="1.0" data-ease-out="1.5">
         <source src="assets/CaPE_promo.mp4" type="video/mp4">
         Your browser can’t play this video. <a href="assets/CaPE_promo.mp4">Download it instead</a>.
       </video>
@@ -251,6 +252,21 @@ footer img{height:84px;background:#fff;border-radius:12px;padding:6px}
       </li>
     </ol>
     <p class="repeat"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A7A8A" stroke-width="2.2" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.3L3 16M3 21v-5h5"/></svg>Repeat until the question budget is spent. Under non-adversarial feedback, the posterior provably concentrates on the true graph, up to what the data can identify.</p>
+  </div>
+</section>
+
+<section id="walkthrough">
+  <div class="wrap">
+    <div class="prose">
+      <h2>How to use CaPE</h2>
+      <p style="margin-top:16px">A four-minute walkthrough for experts: how to read the diagram, answer CaPE’s questions, see what each answer changed, review any link yourself, rule out a direction you’re sure about, and finish with the learned graph. It is demonstrated with the Millennium Cohort Study: 13 measures for around 9,000 children, from 9 months to age 17.</p>
+    </div>
+    <div class="video-frame">
+      <video id="howto-video" controls preload="metadata" poster="assets/cape_how_to_use_poster.jpg" data-stop-before="0.8" data-ease-out="0">
+        <source src="assets/CaPE_how_to_use.mp4" type="video/mp4">
+        Your browser can’t play this video. <a href="assets/CaPE_how_to_use.mp4">Download it instead</a>.
+      </video>
+    </div>
   </div>
 </section>
 
@@ -467,21 +483,22 @@ python experiments/run_sachs_hitl.py</code></pre>
     el("text",{x:sx(0)+16,y:sy(0.2)-8,"font-family":"Outfit, sans-serif","font-size":13,fill:"#56657F"},"data only 0.22");
 })();
 
-/* ---------- Video: stop on the final slide (the last second of the file fades out) ---------- */
-document.querySelectorAll(".video-frame video").forEach(v=>{
-  const HOLD=1.0;           // seconds before the end where the final slide is complete
+/* ---------- Videos: stop on the final slide (each file ends with a short fade) ---------- */
+document.querySelectorAll("video[data-stop-before]").forEach(v=>{
+  const HOLD=parseFloat(v.dataset.stopBefore)||0;   // seconds before the end where the final slide is complete
+  const EASE=parseFloat(v.dataset.easeOut)||0;      // seconds over which to lower the sound before stopping
   let done=false, vol=1;
   const stopAt=()=>v.duration-HOLD;
   v.addEventListener("timeupdate",()=>{
     if(!v.duration||v.seeking||v.paused)return;
     const left=stopAt()-v.currentTime;
-    if(left<1.5&&left>0)v.volume=vol*Math.max(0,left/1.5);   // ease the music out
-    else if(left>=1.5&&v.volume!==vol)v.volume=vol;          // restore after seeking back
+    if(EASE>0&&left<EASE&&left>0)v.volume=vol*Math.max(0,left/EASE);
+    else if(v.volume!==vol&&left>=EASE)v.volume=vol;
     if(left<=0){done=true;v.pause();v.currentTime=stopAt();v.volume=vol;}
   });
   v.addEventListener("ended",()=>{done=true;v.currentTime=stopAt();});
   v.addEventListener("play",()=>{if(done){done=false;v.currentTime=0;}vol=v.volume||1;});
-  v.addEventListener("volumechange",()=>{if(!v.paused&&v.currentTime<stopAt()-1.5)vol=v.volume;});
+  v.addEventListener("volumechange",()=>{if(!v.paused&&v.currentTime<stopAt()-EASE)vol=v.volume;});
 });
 
 /* ---------- Copy buttons ---------- */
